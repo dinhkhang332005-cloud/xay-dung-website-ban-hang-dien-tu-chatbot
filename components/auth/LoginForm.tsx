@@ -7,10 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginInput } from "@/validations/auth.schema";
 import { authApi } from "@/app/api_Client/auth.api";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 
 
 const LoginForm = () => {
  const router = useRouter();
+ const {setUser} = useAuthStore();
  const [showPassword, setShowPassword] = useState(false);
  const [serverErrors, setServerErrors] = useState("");
  const [successMessage, setSuccessMessage] = useState("");
@@ -35,7 +37,7 @@ const LoginForm = () => {
       const response: any = await authApi.login(data);
       
       if (response?.user) {
-        localStorage.setItem("user", JSON.stringify(response.user));
+        setUser(response.user);
       }
       setSuccessMessage("Đăng nhập thành công! Đang chuyển hướng...");
       

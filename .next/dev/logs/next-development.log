@@ -1,0 +1,16 @@
+{"timestamp":"00:00:01.641","source":"Server","level":"LOG","message":"- Cache Components enabled"}
+{"timestamp":"00:00:01.641","source":"Server","level":"LOG","message":"- Partial Prefetching enabled"}
+{"timestamp":"00:00:01.642","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:08.920","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:24.111","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:02:02.903","source":"Server","level":"LOG","message":"✓ Compiled in 167ms"}
+{"timestamp":"00:02:46.543","source":"Server","level":"LOG","message":"✓ Compiled in 53ms"}
+{"timestamp":"00:03:15.709","source":"Server","level":"LOG","message":"✓ Compiled in 173ms"}
+{"timestamp":"00:03:45.819","source":"Server","level":"LOG","message":"✓ Compiled in 75ms"}
+{"timestamp":"00:03:57.491","source":"Server","level":"LOG","message":"✓ Compiled in 76ms"}
+{"timestamp":"00:04:04.653","source":"Server","level":"LOG","message":"✓ Compiled in 49ms"}
+{"timestamp":"00:05:41.446","source":"Server","level":"LOG","message":"✓ Compiled in 115ms"}
+{"timestamp":"00:08:31.391","source":"Server","level":"LOG","message":"✓ Compiled in 98ms"}
+{"timestamp":"00:09:27.294","source":"Server","level":"LOG","message":"prisma:query \"SELECT \\\"public\\\".\\\"nguoi_dung\\\".\\\"id\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"name\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"email\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"emailVerified\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"password\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"image\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"phoneNumber\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"address\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"role\\\"::text, \\\"public\\\".\\\"nguoi_dung\\\".\\\"createdAt\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"updatedAt\\\" FROM \\\"public\\\".\\\"nguoi_dung\\\" WHERE (\\\"public\\\".\\\"nguoi_dung\\\".\\\"email\\\" = $1 AND 1=1) LIMIT $2 OFFSET $3\""}
+{"timestamp":"00:16:43.814","source":"Server","level":"LOG","message":"prisma:query \"SELECT \\\"public\\\".\\\"nguoi_dung\\\".\\\"id\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"name\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"email\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"emailVerified\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"password\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"image\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"phoneNumber\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"address\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"role\\\"::text, \\\"public\\\".\\\"nguoi_dung\\\".\\\"createdAt\\\", \\\"public\\\".\\\"nguoi_dung\\\".\\\"updatedAt\\\" FROM \\\"public\\\".\\\"nguoi_dung\\\" WHERE (\\\"public\\\".\\\"nguoi_dung\\\".\\\"email\\\" = $1 AND 1=1) LIMIT $2 OFFSET $3\""}
+{"timestamp":"00:16:54.873","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
