@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 19, "column": 0}, "map": {"version":3,"sources":["file:///D:/Project%20C%C3%A1%20Nh%C3%A2n/X%C3%A2y%20d%E1%BB%B1ng%20website%20b%C3%A1n%20h%C3%A0ng%20%C4%91i%E1%BB%87n%20t%E1%BB%AD%20t%C3%ADch%20h%E1%BB%A3p%20chat%20box/my-app/app/favicon.ico.mjs%20(structured%20image%20object)"],"sourcesContent":["import src from \"IMAGE\";\nexport default { src, width: 48, height: 48 }\n"],"names":["src","width","height"],"mappings":";;;;AAAA;;uCACe;IAAEA,KAAAA,mIAAG;IAAEC,OAAO;IAAIC,QAAQ;AAAG"}}]
-}
