@@ -1,0 +1,299 @@
+
+
+datasource db {
+  provider = "postgresql"
+  // url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ------------------------------------------------------------------------------
+// PHẦN 1: QUẢN LÝ TÀI KHOẢN VÀ PHÂN QUYỀN (Áp dụng cho UC-04, UC-05, UC-06, UC-18)
+// ------------------------------------------------------------------------------
+
+// Vai trò của người dùng trong hệ thống
+enum Role {
+  USER     // Khách hàng mua sắm thông thường
+  ADMIN    // Quản trị viên (Chủ cửa hàng)
+  SUPPORT  // Nhân viên trực tổng đài chăm sóc khách hàng
+}
+
+model User {
+  id            String    @id @default(cuid()) // Mã định danh duy nhất của người dùng
+  name          String?   // Họ và tên khách hàng
+  email         String    @unique // Địa chỉ hòm thư điện tử (dùng để đăng nhập)
+  emailVerified DateTime? // Ngày giờ xác thực email
+  password      String?   // Mật khẩu đã được mã hóa an toàn bằng máy xay bcryptjs
+  image         String?   // Đường dẫn ảnh đại diện
+  phoneNumber   String?   // Số điện thoại liên hệ
+  address       String?   // Địa chỉ giao nhận hàng mặc định
+  role          Role      @default(USER) // Vai trò mặc định là Khách hàng
+  createdAt     DateTime  @default(now()) // Ngày tạo tài khoản
+  updatedAt     DateTime  @updatedAt // Ngày cập nhật thông tin gần nhất
+
+  // Các mối liên kết với dữ liệu khác của khách hàng này
+  orders        Order[]               // Danh sách các đơn hàng khách đã mua
+  cart          Cart?                 // Giỏ hàng hiện tại của khách
+  reviews       Review[]              // Các bài đánh giá sản phẩm do khách viết
+  chatSessions  ChatSession[]         // Lịch sử các cuộc trò chuyện tư vấn
+  behaviors     CustomerBehaviorLog[] // Nhật ký các lần xem sản phẩm để AI hiểu sở thích
+
+  @@map("nguoi_dung") // Tên bảng lưu trong cơ sở dữ liệu PostgreSQL
+}
+
+// ------------------------------------------------------------------------------
+// PHẦN 2: DANH MỤC VÀ SẢN PHẨM ĐIỆN TỬ (Áp dụng cho UC-01, UC-02, UC-03, UC-17, UC-20)
+// ------------------------------------------------------------------------------
+
+// Danh mục ngành hàng (Ví dụ: Laptop, Điện thoại, Tai nghe, Bàn phím)
+model Category {
+  id          String     @id @default(cuid()) // Mã danh mục
+  name        String     // Tên danh mục (ví dụ: "Laptop Gaming")
+  slug        String     @unique // Đường dẫn thân thiện trên web (ví dụ: "laptop-gaming")
+  description String?    // Mô tả ngắn về danh mục
+  imageUrl    String?    // Ảnh đại diện danh mục
+  parentId    String?    // Mã danh mục cha (nếu là danh mục con)
+  parent      Category?  @relation("DanhMucChaCon", fields: [parentId], references: [id])
+  children    Category[] @relation("DanhMucChaCon")
+  products    Product[]  // Danh sách các sản phẩm nằm trong danh mục này
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("danh_muc")
+}
+
+// Bảng thông tin sản phẩm bán ra
+model Product {
+  id             String    @id @default(cuid()) // Mã sản phẩm
+  name           String    // Tên sản phẩm (Ví dụ: Laptop Asus ROG Strix G16)
+  slug           String    @unique // Đường dẫn xem trên web (ví dụ: "laptop-asus-rog-strix-g16")
+  description    String    @db.Text // Bài viết giới thiệu chi tiết về sản phẩm
+  price          Decimal   @db.Decimal(12, 2) // Giá bán thực tế hiện tại
+  originalPrice  Decimal?  @db.Decimal(12, 2) // Giá gốc trước khi giảm giá (nếu có)
+  stockQuantity  Int       @default(0) // Số lượng máy còn lại trong kho
+  brand          String    // Thương hiệu (Apple, Asus, Dell, Samsung, Sony...)
+  warrantyMonths Int       @default(12) // Thời hạn bảo hành chính hãng (tính theo tháng)
+  isFeatured     Boolean   @default(false) // Có phải sản phẩm nổi bật ghim ở trang chủ không
+  isActive       Boolean   @default(true) // Sản phẩm còn kinh doanh hay đã ngừng bán
+  images         String[]  // Bộ sưu tập nhiều ảnh của sản phẩm
+  categoryId     String    // Thuộc danh mục nào
+  category       Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  // Bảng con chứa thông số kỹ thuật chi tiết của đồ điện tử
+  specifications ProductSpecification[]
+
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  reviews        Review[]
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([name, brand])
+  @@index([categoryId])
+  @@map("san_pham")
+}
+
+// Bảng chi tiết thông số kỹ thuật (Đặc thù bắt buộc của đồ điện tử)
+model ProductSpecification {
+  id        String   @id @default(cuid())
+  specKey   String   // Tên thông số (Ví dụ: "Bộ vi xử lý CPU", "Bộ nhớ RAM", "Ổ cứng", "Card màn hình")
+  specValue String   // Giá trị thông số (Ví dụ: "Intel Core i7 13700H", "16GB DDR5", "512GB SSD")
+  productId String   // Gắn với sản phẩm nào
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("thong_so_ky_thuat")
+}
+
+// ------------------------------------------------------------------------------
+// PHẦN 3: GIỎ HÀNG (Áp dụng cho UC-07)
+// ------------------------------------------------------------------------------
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique // Mỗi khách hàng chỉ có duy nhất 1 giỏ hàng
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[] // Các món hàng đang nằm trong giỏ
+  updatedAt DateTime   @updatedAt
+
+  @@map("gio_hang")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String   // Nằm trong giỏ hàng nào
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String   // Là món hàng nào
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1) // Số lượng muốn mua (mặc định là 1)
+
+  @@unique([cartId, productId])
+  @@map("chi_tiet_gio_hang")
+}
+
+// ------------------------------------------------------------------------------
+// PHẦN 4: ĐƠN HÀNG VÀ THANH TOÁN (Áp dụng cho UC-08, UC-09, UC-10, UC-19, UC-21)
+// ------------------------------------------------------------------------------
+
+// Các giai đoạn trạng thái của một đơn hàng
+enum OrderStatus {
+  PENDING           // Chờ xác nhận từ cửa hàng
+  CONFIRMED         // Cửa hàng đã xác nhận đơn
+  PROCESSING        // Nhân viên đang đóng gói hàng
+  SHIPPING          // Shipper đang đi giao hàng
+  DELIVERED         // Đã giao hàng tới tay khách thành công
+  CANCELLED         // Khách hoặc cửa hàng đã hủy đơn này
+}
+
+// Hình thức trả tiền
+enum PaymentMethod {
+  COD               // Trả tiền mặt trực tiếp cho Shipper khi nhận đồ
+  VNPAY             // Thanh toán trực tuyến quét mã qua cổng VNPay
+  MOMO              // Thanh toán qua ví điện tử MoMo
+  BANK_TRANSFER     // Chuyển khoản ngân hàng trực tiếp
+}
+
+// Trạng thái trả tiền
+enum PaymentStatus {
+  UNPAID            // Chưa trả tiền
+  PAID              // Đã trả tiền thành công
+  REFUNDED          // Đã trả lại tiền cho khách (hoàn tiền)
+  FAILED            // Giao dịch thanh toán bị lỗi
+}
+
+// Bảng lưu thông tin đơn đặt hàng
+model Order {
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique // Mã đơn hàng dễ đọc (Ví dụ: DH-20261103-001)
+  userId          String        // Khách hàng nào đặt
+  user            User          @relation(fields: [userId], references: [id])
+  status          OrderStatus   @default(PENDING) // Trạng thái đơn hiện tại
+  totalAmount     Decimal       @db.Decimal(12, 2) // Tổng số tiền khách phải trả cho đơn này
+  shippingFee     Decimal       @default(0) @db.Decimal(12, 2) // Tiền phí vận chuyển
+  shippingAddress String        // Địa chỉ giao nhận hàng
+  recipientName   String        // Tên người nhận hàng
+  recipientPhone  String        // Số điện thoại người nhận hàng
+  note            String?       // Lời nhắn dặn dò của khách cho cửa hàng
+
+  items           OrderItem[]   // Danh sách các món đồ mua trong đơn này
+  payment         Payment?      // Thông tin thanh toán của đơn này
+
+  createdAt       DateTime      @default(now()) // Thời điểm khách bấm đặt hàng
+  updatedAt       DateTime      @updatedAt
+
+  @@index([userId])
+  @@map("don_hang")
+}
+
+// Bảng lưu từng món đồ trong đơn hàng (Lưu giá chết tại lúc mua để không bị đổi khi sản phẩm tăng/giảm giá)
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String   // Thuộc về đơn hàng nào
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String   // Sản phẩm nào
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      // Số lượng mua
+  unitPrice Decimal  @db.Decimal(12, 2) // Đơn giá tại đúng thời điểm bấm nút Mua
+
+  @@map("chi_tiet_don_hang")
+}
+
+// Bảng lưu thông tin giao dịch trả tiền
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String        @unique // Mỗi đơn hàng gắn với 1 giao dịch trả tiền
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method        PaymentMethod @default(COD) // Phương thức thanh toán khách chọn
+  status        PaymentStatus @default(UNPAID) // Trạng thái đã trả hay chưa
+  transactionId String?       // Mã giao dịch ngân hàng hoặc cổng VNPay trả về
+  amount        Decimal       @db.Decimal(12, 2) // Số tiền thực tế thanh toán
+  paidAt        DateTime?     // Thời điểm tiền vào tài khoản
+  metadata      Json?         // Bản ghi chi tiết kết quả từ cổng thanh toán gửi sang
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("thanh_toan")
+}
+
+// ------------------------------------------------------------------------------
+// PHẦN 5: ĐÁNH GIÁ SẢN PHẨM (Khách cho điểm sao và bình luận)
+// ------------------------------------------------------------------------------
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // Điểm đánh giá (từ 1 đến 5 sao)
+  comment   String?  @db.Text // Lời nhận xét, cảm nghĩ của khách
+  userId    String   // Khách hàng nào đánh giá
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   // Đánh giá cho sản phẩm nào
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("danh_gia")
+}
+
+// ------------------------------------------------------------------------------
+// PHẦN 6: TRỢ LÝ AI & CHĂM SÓC KHÁCH HÀNG CHATWOOT (Áp dụng cho UC-11, UC-14, UC-15, UC-16)
+// ------------------------------------------------------------------------------
+
+// Trạng thái của cuộc hội thoại hỗ trợ
+enum SessionStatus {
+  BOT_ACTIVE        // Trợ lý AI đang trực tiếp trò chuyện và tư vấn
+  HANDOVER_PENDING  // Khách bấm "Muốn gặp nhân viên", đang rung chuông chờ người tiếp nhận
+  SUPPORT_ACTIVE    // Nhân viên thật đang trực tiếp gõ phím nói chuyện với khách
+  CLOSED            // Cuộc trò chuyện đã xong và đóng lại
+}
+
+// Ai là người gửi tin nhắn này
+enum MessageSender {
+  USER          // Khách hàng gửi
+  AI            // Trí tuệ nhân tạo trả lời
+  SUPPORT_AGENT // Nhân viên chăm sóc khách hàng trả lời
+}
+
+// Bảng lưu một phiên trò chuyện
+model ChatSession {
+  id                String        @id @default(cuid())
+  userId            String?       // Khách vãng lai (chưa đăng nhập) hoặc khách đã có tài khoản
+  user              User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status            SessionStatus @default(BOT_ACTIVE) // Mặc định do AI tiếp đón trước
+  chatwootConvId    Int?          // Mã số hội thoại trên hệ thống Chatwoot để đồng bộ tin nhắn
+  assignedSupportId String?       // Mã nhân viên nào đang nhận ca hỗ trợ này
+  messages          ChatMessage[] // Toàn bộ lời thoại trao đổi qua lại
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@map("phien_tro_chuyen")
+}
+
+// Bảng lưu từng câu tin nhắn trong cuộc trò chuyện
+model ChatMessage {
+  id        String        @id @default(cuid())
+  sessionId String        // Nằm trong phiên trò chuyện nào
+  session   ChatSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender    MessageSender // Ai vừa nói câu này (Khách, AI hay Nhân viên)
+  content   String        @db.Text // Nội dung câu nói
+  createdAt DateTime      @default(now()) // Thời điểm nhắn
+
+  @@map("tin_nhan")
+}
+
+// ------------------------------------------------------------------------------
+// PHẦN 7: THEO DÕI HÀNH VI ĐỂ AI GỢI Ý MUA HÀNG (Áp dụng cho UC-12, UC-13)
+// ------------------------------------------------------------------------------
+
+model CustomerBehaviorLog {
+  id        String   @id @default(cuid())
+  userId    String?  // Mã khách hàng (nếu đã đăng nhập)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // Hành động của khách: "XEM_SAN_PHAM", "THEM_GIO_HANG", "TIM_KIEM"
+  details   Json?    // Chi tiết hành vi: xem hãng nào, tầm giá bao nhiêu triệu
+  createdAt DateTime @default(now())
+
+  @@index([userId, action])
+  @@map("nhat_ky_khach_hang")
+}
