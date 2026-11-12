@@ -1,5 +1,5 @@
 import { axiosClient } from "@/lib/axios";
-import { LoginInput, RegisterInput } from "@/validations/auth.schema";
+import { ForgotPasswordInput, LoginInput, RegisterInput, ResetPasswordInput } from "@/validations/auth.schema";
 
 export const authApi = {
   
@@ -10,4 +10,13 @@ export const authApi = {
     return await axiosClient.post("/api/auth/login", data);
   },
 
+
+  forgotPassword: async (data: ForgotPasswordInput) => {
+    return await axiosClient.post("/api/auth/forgot-password", data);
+  },
+
+  
+  resetPassword: async (data: ResetPasswordInput) => {
+    return await axiosClient.post("/api/auth/reset-password", data);
+  },
 };
