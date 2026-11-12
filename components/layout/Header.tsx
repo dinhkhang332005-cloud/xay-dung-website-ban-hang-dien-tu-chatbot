@@ -47,7 +47,11 @@ const Header = () => {
           ) : user ? (
             /* 👉 ĐÃ ĐĂNG NHẬP: Hiện tên khách, vai trò và nút Đăng Xuất */
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                            <Link
+                href="/profile"
+                title="Xem hồ sơ cá nhân"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-blue-500 transition"
+              >
                 <UserIcon size={16} className="text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 max-w-[120px] truncate">
                   {user.name || user.email}
@@ -56,7 +60,7 @@ const Header = () => {
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                   {user.role}
                 </span>
-              </div>
+              </Link>
               {/* NÚT BẤM ĐĂNG XUẤT (UC-06) */}
               <button
                 onClick={handleLogout}

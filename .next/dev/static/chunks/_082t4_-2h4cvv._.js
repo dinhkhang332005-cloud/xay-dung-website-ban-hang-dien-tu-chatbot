@@ -515,6 +515,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 __turbopack_context__.s([
+    "changePasswordSchema",
+    ()=>changePasswordSchema,
     "forgotPasswordSchema",
     ()=>forgotPasswordSchema,
     "loginSchema",
@@ -522,7 +524,9 @@ __turbopack_context__.s([
     "registerSchema",
     ()=>registerSchema,
     "resetPasswordSchema",
-    ()=>resetPasswordSchema
+    ()=>resetPasswordSchema,
+    "updateProfileSchema",
+    ()=>updateProfileSchema
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$object$3e$__ = __turbopack_context__.i("[project]/node_modules/zod/v4/classic/external.js [app-client] (ecmascript) <export * as z .object>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$string$3e$__ = __turbopack_context__.i("[project]/node_modules/zod/v4/classic/external.js [app-client] (ecmascript) <export * as z .string>");
@@ -587,6 +591,43 @@ const resetPasswordSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node
     message: "Mật khẩu xác nhận không trùng khớp với mật khẩu mới",
     path: [
         "confirmPassword"
+    ]
+});
+const updateProfileSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$object$3e$__["z"].object({
+    name: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$string$3e$__["z"].string().min(2, {
+        message: "Họ và tên ít nhất có 2 ký tự"
+    }).max(50, {
+        message: "Họ và tên không được vượt quá 50 ký tự"
+    }),
+    phoneNumber: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$string$3e$__["z"].string().regex(/^[0-9]{10}$/, {
+        message: "Số điện thoại phải gồm đúng 10 chữ số"
+    }).optional().or(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$literal$3e$__["z"].literal("")),
+    address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$string$3e$__["z"].string().max(200, {
+        message: "Địa chỉ giao hàng tối đa 200 ký tự"
+    }).optional().or(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$literal$3e$__["z"].literal(""))
+});
+const changePasswordSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$object$3e$__["z"].object({
+    currentPassword: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$string$3e$__["z"].string().min(1, {
+        message: "Vui lòng nhập mật khẩu hiện tại"
+    }),
+    newPassword: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$string$3e$__["z"].string().min(8, {
+        message: "Mật khẩu mới phải có ít nhất 8 ký tự"
+    }).regex(/[A-Z]/, {
+        message: "Phải có ít nhất một chữ cái viết hoa"
+    }).regex(/[a-z]/, {
+        message: "Phải có ít nhất một chữ cái viết thường"
+    }).regex(/[0-9]/, {
+        message: "Phải có ít nhất một chữ số"
+    }).regex(/[^A-Za-z0-9]/, {
+        message: "Phải có ít nhất một ký tự đặc biệt"
+    }),
+    confirmNewPassword: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v4$2f$classic$2f$external$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z__$2e$string$3e$__["z"].string().min(1, {
+        message: "Vui lòng xác nhận lại mật khẩu mới"
+    })
+}).refine((data)=>data.newPassword === data.confirmNewPassword, {
+    message: "Mật khẩu mới xác nhận không trùng khớp",
+    path: [
+        "confirmNewPassword"
     ]
 });
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {

@@ -1,11 +1,6 @@
 {
-  "/(auth)/forgot-password/page": "app/(auth)/forgot-password/page.js",
-  "/(auth)/login/page": "app/(auth)/login/page.js",
   "/(auth)/register/page": "app/(auth)/register/page.js",
-  "/(auth)/reset-password/page": "app/(auth)/reset-password/page.js",
-  "/api/auth/forgot-password/route": "app/api/auth/forgot-password/route.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/api/auth/register/route": "app/api/auth/register/route.js",
-  "/api/auth/reset-password/route": "app/api/auth/reset-password/route.js",
+  "/(user)/profile/page": "app/(user)/profile/page.js",
+  "/api/user/profile/route": "app/api/user/profile/route.js",
   "/page": "app/page.js"
 }
